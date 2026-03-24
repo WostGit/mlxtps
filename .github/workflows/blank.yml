@@ -1,10 +1,10 @@
 name: MLX TPS Benchmark
 on:
-  workflow_dispatch: # Allows you to run this manually from the Actions tab
+  workflow_dispatch:
 
 jobs:
   benchmark-m1:
-    runs-on: macos-latest # This points to Apple Silicon (M1/M2) runners
+    runs-on: macos-latest # Targets M1/M2 Silicon
     
     steps:
       - name: Checkout code
@@ -22,13 +22,14 @@ jobs:
 
       - name: Run Benchmark
         run: |
-          # We use the 4-bit quantized version for maximum throughput
+          # Standard 0.5B model for speed testing
           MODEL="mlx-community/Qwen2.5-0.5B-Instruct-4bit"
           
           echo "### STARTING TPS BENCHMARK ###"
-          # -p: Input tokens (Prompt)
-          # -g: Output tokens (Generation)
+          # --prompt-tokens: Pre-fill speed (reading input)
+          # --generation-tokens: Decoding speed (writing output)
           python -m mlx_lm.benchmark \
             --model $MODEL \
             --prompt-tokens 512 \
-            --tokens-to-generate 128
+            --generation-tokens 128 \
+            --num-trials 3
